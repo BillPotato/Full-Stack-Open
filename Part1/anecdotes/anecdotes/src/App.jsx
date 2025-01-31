@@ -1,21 +1,38 @@
 import { useState } from 'react'
 
-const Button = (props) => (
-  <button onClick={props.onClick}>
-    {props.label}
+// Destructure
+const Button = ({onClick, label}) => (
+  <button onClick={onClick}>
+    {label}
   </button>
   ) 
 
-const Quote = (props) => (
+const DisplayQuote = ({anecdotes, selected}) => (
   <p>
-    {props.quotes[props.selected]}
+    {anecdotes[selected]}
   </p>
   )
 
-const Votes = (props) => {
-  // console.log("Displaying votes for", props.selected)
-  return <p>has {props.votes[props.selected]} votes.</p>
-  }
+const DisplayVotes = ({votes, selected}) =>(
+  <p>has {votes[selected]} votes.</p>
+  )
+
+const DisplayMostVotes = ({votes, anecdotes}) => {
+  
+  let max = 0
+  let index_max = 0
+  
+  votes.forEach((value, index) => {
+    if (value > max) {
+      max = value
+      index_max = index
+    }
+  })
+  
+  return (
+    <p>"{anecdotes[index_max]}" has the most votes ({max}).</p>
+    )
+}
 
 const App = () => {
   const anecdotes = [
@@ -62,8 +79,9 @@ const App = () => {
     <>
       <Button label="next quote" onClick={handleClick}/>
       <Button label="vote" onClick={handleVote} />
-      <Quote quotes={anecdotes} selected={selected} />
-      <Votes votes={votes} selected={selected} />
+      <DisplayQuote anecdotes={anecdotes} selected={selected} />
+      <DisplayVotes votes={votes} selected={selected} />
+      <DisplayMostVotes votes={votes} anecdotes={anecdotes} />
     </>
   )
 }
