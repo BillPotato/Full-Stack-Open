@@ -12,6 +12,11 @@ const Quote = (props) => (
   </p>
   )
 
+const Votes = (props) => {
+  // console.log("Displaying votes for", props.selected)
+  return <p>has {props.votes[props.selected]} votes.</p>
+  }
+
 const App = () => {
   const anecdotes = [
     'If it hurts, do it more often.',
@@ -37,16 +42,28 @@ const App = () => {
         num +=1
       }
     }
-    console.log("Button clicked", num)
+    console.log("next quote clicked", num)
     setSelected(num)
   }
+
+  const handleVote = () => {
+    const updatedVotes = [...votes]
+    updatedVotes[selected] += 1
+    console.log("vote clicked", updatedVotes)
+    setVotes(updatedVotes)
+  }
+
+  
    
   const [selected, setSelected] = useState(0)
+  const [votes, setVotes] = useState(new Array(8).fill(0))
 
   return (
     <>
       <Button label="next quote" onClick={handleClick}/>
-      <Quote quotes={anecdotes} selected={selected}/>
+      <Button label="vote" onClick={handleVote} />
+      <Quote quotes={anecdotes} selected={selected} />
+      <Votes votes={votes} selected={selected} />
     </>
   )
 }
