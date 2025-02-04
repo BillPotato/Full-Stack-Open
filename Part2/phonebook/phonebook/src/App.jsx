@@ -7,18 +7,26 @@ const App = () => {
   const [newName, setNewName] = useState("")
 
   const handleNameChange = (event) => {
-    console.log(event.target.value)
+    // console.log(event.target.value)
     setNewName(event.target.value)
   }
 
   const addName = (event) => {
     event.preventDefault()
-    const newObj = {
-      name: newName
-    }
 
-    setPersons(persons.concat(newObj))
-    setNewName("")
+    const filterArray = persons.filter((person) =>
+      person.name === newName
+      )
+
+    if (filterArray.length === 0) {
+      const newObj = {
+        name: newName
+      }
+      setPersons(persons.concat(newObj))
+      setNewName("")
+    } else {
+      alert(`${newName} already exists!`)
+    }
   }
 
   return (
