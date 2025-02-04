@@ -1,4 +1,7 @@
 import { useState } from "react"
+import Filter from "./components/Filter.jsx"
+import Form from "./components/Form.jsx"
+import Numbers from "./components/Numbers.jsx"
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -49,34 +52,20 @@ const App = () => {
   const filteredArray = persons.filter((person) =>
     person.name.toUpperCase().indexOf(filter.toUpperCase()) !== -1
   )
-  // console.log(filter, filteredArray)
+  // console.log(filteredArray)
 
   return (
     <>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with <input value={filter} onChange={handleFilterChange} />
-      </div>
+      <Filter value={filter} onChange={handleFilterChange} />
       <h2>add new stuff</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input id="name" value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          number: <input id="number" value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <Form 
+        nameValue={newName} onNameChange={handleNameChange}
+        numberValue={newNumber} onNumberChange={handleNumberChange}
+        onSubmit={addPerson}
+      />
       <h2>Numbers</h2>
-      <ul>
-        {filteredArray.map((person) => 
-          <li key={person.name}>
-            {person.name} {person.number}
-          </li>
-        )}
-      </ul>
+      <Numbers displayPersons={filteredArray} />
     </>
   )
 }
