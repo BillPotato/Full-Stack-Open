@@ -3,6 +3,7 @@ import axios from "axios"
 import Filter from "./components/Filter.jsx"
 import Form from "./components/Form.jsx"
 import Numbers from "./components/Numbers.jsx"
+import numberService from "./services/numbers.js"
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -12,11 +13,11 @@ const App = () => {
 
   useEffect(() => {
     console.log("effect")
-    axios
-      .get("http://localhost:3001/persons")
-      .then(response => {
-        setPersons(response.data)
-        console.log(persons)
+    numberService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
+        // console.log(persons)
       })
   }, [])
 
@@ -32,7 +33,7 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
 
-    const existedArray = persons.filter((person) =>
+    const existedArray = persons.filter(person =>
       person.name === newName
       )
 
@@ -42,9 +43,13 @@ const App = () => {
         number: newNumber,
       }
       
-      setPersons(persons.concat(newObj))
-      setNewName("")
-      setNewNumber("")
+      numberService
+        .create(newObj)
+        .then(newPerson => {
+          setPersons(persons.concat(newPerson))
+          setNewName("")
+          setNewNumber("")
+        })
 
     } else {
       alert(`${newName} already exists!`)
