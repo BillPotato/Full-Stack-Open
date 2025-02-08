@@ -56,6 +56,18 @@ const App = () => {
     }
   }
 
+  const deletePerson = (id, name) => {
+    const confirmed = window.confirm(`Do you want to delete ${name}'s number?`)
+
+    if (confirmed) {
+      numberService
+        .del(id)
+        .then(deletedPerson => {
+          setPersons(persons.filter(person => person.id !== deletedPerson.id))
+        })
+    }
+  }
+
   const handleFilterChange = (event) => {
     setFilter(event.target.value)
   }
@@ -76,7 +88,10 @@ const App = () => {
         onSubmit={addPerson}
       />
       <h2>Numbers</h2>
-      <Numbers displayPersons={filteredArray} />
+      <Numbers 
+        displayPersons={filteredArray}
+        deleteFunction={deletePerson} 
+      />
     </>
   )
 }
