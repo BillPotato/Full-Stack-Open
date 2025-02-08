@@ -37,11 +37,12 @@ const App = () => {
       person.name === newName
       )
 
+    const newObj = {
+      name: newName,
+      number: newNumber,
+    }
+
     if (existedArray.length === 0) {
-      const newObj = {
-        name: newName,
-        number: newNumber,
-      }
       
       numberService
         .create(newObj)
@@ -52,7 +53,19 @@ const App = () => {
         })
 
     } else {
-      alert(`${newName} already exists!`)
+      const existedPerson = existedArray[0]
+      const confirmed = window.confirm(`Do you want to replace ${existedPerson.name}'s Number?`)
+      if (confirmed) {
+        numberService
+          .update(existedPerson.id, newObj)
+          .then(updatedPerson => {
+            setPersons(persons.map(person =>
+              (person.id) === (updatedPerson.id) ? updatedPerson : person
+            ))
+            setNewName("")
+            setNewNumber("")
+          })
+      }
     }
   }
 
