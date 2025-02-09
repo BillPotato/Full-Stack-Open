@@ -28,10 +28,17 @@ const App = () => {
       )
     })
 
+    const showCountry = event => {
+      setFilterValue(event.target.name)
+    }
+
   return (
     <>
       <Filter value={filterValue} onChange={handleFilterChange} />
-      <Countries countries={filteredArray} />
+      <Countries 
+        countries={filteredArray}
+        onShow={showCountry}
+      />
     </>
   )
 }

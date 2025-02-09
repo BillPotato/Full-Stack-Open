@@ -21,7 +21,12 @@ const Countries = (props) => {
 		)
 	}
 	return countries.map(country => 
-		<p key={country.name.common}>{country.name.common}</p>
+		<p key={country.name.common}>
+			{country.name.common} 
+			<button name={country.name.common} onClick={props.onShow}>
+				show
+			</button> 
+		</p>
 	)
 }
 
