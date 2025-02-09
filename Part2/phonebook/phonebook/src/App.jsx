@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
+import numberService from "./services/numbers.js"
 import Filter from "./components/Filter.jsx"
 import Form from "./components/Form.jsx"
 import Numbers from "./components/Numbers.jsx"
-import numberService from "./services/numbers.js"
+import Notification from "./components/Notification.jsx"
+
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState("")
   const [newNumber, setNewNumber] = useState("")
   const [filter, setFilter] = useState("")
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
     console.log("effect")
@@ -20,6 +23,13 @@ const App = () => {
         // console.log(persons)
       })
   }, [])
+
+  const setTempMessage = message => {
+    setMessage(message)
+    setTimeout(() => {
+      setMessage(null)
+    }, 5000)
+  }
 
   const handleNameChange = (event) => {
     // console.log(event.target.value)
@@ -50,6 +60,7 @@ const App = () => {
           setPersons(persons.concat(newPerson))
           setNewName("")
           setNewNumber("")
+          setTempMessage(`Person ${newPerson.name} was successfully added!`)
         })
 
     } else {
@@ -93,6 +104,7 @@ const App = () => {
   return (
     <>
       <h2>Phonebook</h2>
+      <Notification message={message} />
       <Filter value={filter} onChange={handleFilterChange} />
       <h2>add new stuff</h2>
       <Form 
