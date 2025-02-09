@@ -46,6 +46,8 @@ const App = () => {
       setFilterValue(event.target.name)
     }
 
+    console.log(filteredArray.length, filterValue)
+
   return (
     <>
       <Filter value={filterValue} onChange={handleFilterChange} />

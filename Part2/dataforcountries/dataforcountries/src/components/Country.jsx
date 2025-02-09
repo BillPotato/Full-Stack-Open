@@ -1,6 +1,7 @@
 const Country = (props) => {
 	const weatherImg = `https://openweathermap.org/img/wn/${props.weatherJSON.list[0].weather[0].icon}@2x.png`
-	// console.log(weatherImg)
+
+	console.log(props.weatherJSON)
 
 	return (
 		<div>

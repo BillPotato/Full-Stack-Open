@@ -2,14 +2,11 @@ import Country from "./Country.jsx"
 
 const Countries = (props) => {
 	const countries = props.countries
-	console.log(countries.length)
-
-	// console.log("in countries", props.weatherJSON)
 
 	if (countries.length > 10) {
 		return <p>Too many matches!</p>
 	}
-	if (countries.length === 1) {
+	if (countries.length === 1 && Object.keys(props.weatherJSON).length !== 0) {
 		const country = countries[0]
 		return (
 			<Country 
