@@ -13,6 +13,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("")
   const [filter, setFilter] = useState("")
   const [message, setMessage] = useState(null)
+  const [notiStatus, setNotiStatus] = useState(null)
 
   useEffect(() => {
     console.log("effect")
@@ -24,10 +25,12 @@ const App = () => {
       })
   }, [])
 
-  const setTempMessage = message => {
-    setMessage(message)
+  const setTempMessage = (tempMessage, tempNotiStatus) => {
+    setMessage(tempMessage)
+    setNotiStatus(tempNotiStatus)
     setTimeout(() => {
       setMessage(null)
+      setNotiStatus(null)
     }, 5000)
   }
 
@@ -60,7 +63,7 @@ const App = () => {
           setPersons(persons.concat(newPerson))
           setNewName("")
           setNewNumber("")
-          setTempMessage(`Person ${newPerson.name} was successfully added!`)
+          setTempMessage(`Person ${newPerson.name} was successfully added!`, "success")
         })
 
     } else {
@@ -73,6 +76,12 @@ const App = () => {
             setPersons(persons.map(person =>
               (person.id) === (updatedPerson.id) ? updatedPerson : person
             ))
+            setNewName("")
+            setNewNumber("")
+          })
+          .catch(error => {
+            setTempMessage(`Person ${existedPerson.name} is no longer in server`, "error")
+            setPersons(persons.filter(person => person.id !== existedPerson.id))
             setNewName("")
             setNewNumber("")
           })
@@ -104,7 +113,7 @@ const App = () => {
   return (
     <>
       <h2>Phonebook</h2>
-      <Notification message={message} />
+      <Notification className={notiStatus} message={message} />
       <Filter value={filter} onChange={handleFilterChange} />
       <h2>add new stuff</h2>
       <Form 
