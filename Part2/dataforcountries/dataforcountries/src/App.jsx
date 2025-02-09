@@ -52,6 +52,7 @@ const App = () => {
       <Countries 
         countries={filteredArray}
         onShow={showCountry}
+        weatherJSON={weatherJSON}
       />
     </>
   )

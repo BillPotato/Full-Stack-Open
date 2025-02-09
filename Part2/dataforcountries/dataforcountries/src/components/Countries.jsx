@@ -4,6 +4,8 @@ const Countries = (props) => {
 	const countries = props.countries
 	console.log(countries.length)
 
+	// console.log("in countries", props.weatherJSON)
+
 	if (countries.length > 10) {
 		return <p>Too many matches!</p>
 	}
@@ -16,6 +18,7 @@ const Countries = (props) => {
 				area={country.area}
 				languages={Object.values(country.languages)}
 				flags={country.flags}
+				weatherJSON={props.weatherJSON}
 
 			/>
 		)
