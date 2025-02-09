@@ -1,25 +1,27 @@
-const Country = (props) => {
-	const weatherImg = `https://openweathermap.org/img/wn/${props.weatherJSON.list[0].weather[0].icon}@2x.png`
+const Country = ({ name, capital, area, languages, flags, weatherJSON }) => {
+	const temperature = weatherJSON.list[0].main.temp
+	const weatherImg = `https://openweathermap.org/img/wn/${weatherJSON.list[0].weather[0].icon}@2x.png`
+	const wind = weatherJSON.list[0].wind.speed
 
-	console.log(props.weatherJSON)
+	// console.log(weatherJSON)
 
 	return (
 		<div>
-			<h1>{props.name}</h1>
-			<p>capital {props.capital}</p>
-			<p>area {props.area}</p>
+			<h1>{name}</h1>
+			<p>capital {capital}</p>
+			<p>area {area}</p>
 			<br />
 			<b>languages:</b>
 			<br />
 			<ul>
-				{props.languages.map(language =>
+				{languages.map(language =>
 					<li key={language}>{language}</li>)}
 			</ul>
-			<img src={props.flags.png} alt={props.flags.alt} />
-			<h1>Weather in {props.capital}</h1>
-			<p>temperature {props.weatherJSON.list[0].main.temp} Celcius</p>
+			<img src={flags.png} alt={flags.alt} />
+			<h1>Weather in {capital}</h1>
+			<p>temperature {temperature} Celcius</p>
 			<img src={weatherImg} />
-			<p>wind {props.weatherJSON.list[0].wind.speed} m/s</p>
+			<p>wind {wind} m/s</p>
 		</div>
 	)
 }
