@@ -7,6 +7,9 @@ import Countries from "./components/Countries.jsx"
 const App = () => {
   const [filterValue, setFilterValue] = useState("")
   const [allCountriesData, setAllCountriesData] = useState([])
+  const [weatherJSON, setWeatherJSON] = useState({})
+
+  const api_key = import.meta.env.VITE_SOME_KEY
 
   useEffect(() => {
     console.log("Downloading...")
@@ -18,15 +21,26 @@ const App = () => {
       })
   }, [])
 
+  useEffect(() => {
+    if (filteredArray.length === 1) {
+      const weatherURL = `https://api.openweathermap.org/data/2.5/forecast?q=${filteredArray[0].capital}&units=metric&cnt=3&appid=${api_key}`
+      axios
+        .get(weatherURL)
+        .then(response => {
+          setWeatherJSON(response.data)
+        })
+    }
+  }, [filterValue])
+
     const handleFilterChange = event => {
       setFilterValue(event.target.value)
     }
 
-    const filteredArray = allCountriesData.filter(country => {
-      return (
-        country.name.common.toUpperCase().includes(filterValue.toUpperCase()) || country.name.official.toUpperCase().includes(filterValue.toUpperCase())
-      )
-    })
+  const filteredArray = allCountriesData.filter(country => {
+    return (
+      country.name.common.toUpperCase().includes(filterValue.toUpperCase()) || country.name.official.toUpperCase().includes(filterValue.toUpperCase())
+    )
+  })
 
     const showCountry = event => {
       setFilterValue(event.target.name)
