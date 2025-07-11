@@ -1,62 +1,63 @@
-import { useState, useEffect } from "react"
+import {useState, useEffect} from "react"
 import axios from "axios"
 
 import Filter from "./components/Filter.jsx"
-import Countries from "./components/Countries.jsx"
+import List from "./components/List.jsx"
+import Country from "./components/Country"
+
 
 const App = () => {
+  // state declarations
+  const [allCountries, setAllCountries] = useState([])
   const [filterValue, setFilterValue] = useState("")
-  const [allCountriesData, setAllCountriesData] = useState([])
-  const [weatherJSON, setWeatherJSON] = useState({})
 
-  const api_key = import.meta.env.VITE_SOME_KEY
 
-  useEffect(() => {
-    console.log("Downloading...")
-    
-    axios
-      .get("https://studies.cs.helsinki.fi/restcountries/api/all")
-      .then(response => {
-        setAllCountriesData(response.data)
-      })
-  }, [])
 
-  useEffect(() => {
-    if (filteredArray.length === 1) {
-      const weatherURL = `https://api.openweathermap.org/data/2.5/forecast?q=${filteredArray[0].capital}&units=metric&cnt=3&appid=${api_key}`
-      axios
-        .get(weatherURL)
-        .then(response => {
-          setWeatherJSON(response.data)
-        })
-    }
-  }, [filterValue])
+  // non-state declarations
+  const API_key = ""
 
-    const handleFilterChange = event => {
-      setFilterValue(event.target.value)
-    }
 
-  const filteredArray = allCountriesData.filter(country => {
-    return (
-      country.name.common.toUpperCase().includes(filterValue.toUpperCase()) || country.name.official.toUpperCase().includes(filterValue.toUpperCase())
-    )
+
+  // code
+  const displayedCountries = allCountries.filter(country => {
+    const filterValueLower = filterValue.toLowerCase()
+    const commonNameLower = country.name.common.toLowerCase()
+    const officialNameLower = country.name.official.toLowerCase()
+
+    return commonNameLower.includes(filterValueLower) || officialNameLower.includes(filterValueLower)
   })
 
-    const showCountry = event => {
-      setFilterValue(event.target.name)
-    }
 
-    console.log(filteredArray.length, filterValue)
+
+  // useEffect
+  // fetch country data
+  useEffect(() => {
+    axios
+      .get("https://studies.cs.helsinki.fi/restcountries/api/all")
+      .then(response => setAllCountries(response.data))
+  }, [])
+
+
+
+  // handlers
+  const onFilterChange = (event) => {
+    const newFilterValue = event.target.value
+    setFilterValue(newFilterValue)
+    console.log("changed filter to ", newFilterValue)
+  }
+
+  const onShow = (country) => {
+    const newFilterValue = country.name.common
+    setFilterValue(newFilterValue)
+    console.log("changed filter to ", newFilterValue)
+  }
 
   return (
-    <>
-      <Filter value={filterValue} onChange={handleFilterChange} />
-      <Countries 
-        countries={filteredArray}
-        onShow={showCountry}
-        weatherJSON={weatherJSON}
-      />
-    </>
+    <div>
+      <Filter value = {filterValue} onChange = {onFilterChange} />
+      <List displayedCountries = {displayedCountries} onClick = {onShow} />
+      <Country displayedCountries = {displayedCountries} API_key = {API_key} />
+    </div>
   )
 }
 

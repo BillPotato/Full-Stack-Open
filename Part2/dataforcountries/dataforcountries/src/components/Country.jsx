@@ -1,27 +1,26 @@
-const Country = ({ name, capital, area, languages, flags, weatherJSON }) => {
-	const temperature = weatherJSON.list[0].main.temp
-	const weatherImg = `https://openweathermap.org/img/wn/${weatherJSON.list[0].weather[0].icon}@2x.png`
-	const wind = weatherJSON.list[0].wind.speed
+import Weather from "./Weather.jsx"
 
-	// console.log(weatherJSON)
+const Country = ({ displayedCountries, API_key }) => {
+	if (displayedCountries.length != 1) return null
 
+	const country = displayedCountries[0]
+	
 	return (
 		<div>
-			<h1>{name}</h1>
-			<p>capital {capital}</p>
-			<p>area {area}</p>
-			<br />
-			<b>languages:</b>
-			<br />
+			<h1>{country.name.common}</h1>
+			<div>Capital {country.capital[0]}</div>
+			<div>Area {country.area}</div>
+			<h1>Languages</h1>
 			<ul>
-				{languages.map(language =>
-					<li key={language}>{language}</li>)}
+				{Object.entries(country.languages).map(([abbre, lang]) => {
+					// console.log(abbre, lang)
+					return (
+					<li key = {abbre}>{lang}</li>
+					)
+				})}
 			</ul>
-			<img src={flags.png} alt={flags.alt} />
-			<h1>Weather in {capital}</h1>
-			<p>temperature {temperature} Celcius</p>
-			<img src={weatherImg} />
-			<p>wind {wind} m/s</p>
+			<img src = {country.flags.svg} width="300" />
+			<Weather country = {country} API_key = {API_key} />
 		</div>
 	)
 }
