@@ -24,6 +24,8 @@ let persons = [
     }
 ]
 
+app.use(express.json())
+
 app.get("/info", (request, response) => {
 	const message = `Phonebook has info for ${persons.length} people`
 	const now = new Date()
@@ -34,6 +36,13 @@ app.get("/info", (request, response) => {
 
 app.get("/api/persons", (request, response) => {
 	response.json(persons)
+})
+
+app.post("/api/persons", (request, response) => {
+	const person = {...request.body, "id": Math.floor((Math.random() * 1e9)).toString()}
+	persons = persons.concat(person)
+
+	response.json(person)
 })
 
 app.get("/api/persons/:id", (request, response) => {
