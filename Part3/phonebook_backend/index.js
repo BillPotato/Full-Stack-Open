@@ -1,6 +1,8 @@
 const express = require("express")
 const app = express()
 
+const morgan = require("morgan")
+
 let persons = [
     { 
       "id": "1",
@@ -25,13 +27,15 @@ let persons = [
 ]
 
 app.use(express.json())
+app.use(morgan("tiny"))
 
 app.get("/info", (request, response) => {
 	const message = `Phonebook has info for ${persons.length} people`
 	const now = new Date()
 	const time = now.toLocaleString()
 
-	response.send(`<div>${message}</div><br></br><div>${time}</div>`)
+	response.write(`<div>${message}</div>`)
+	response.end(`<div>${time}</div>`)
 })
 
 app.get("/api/persons", (request, response) => {
