@@ -63,21 +63,23 @@ app.get("/api/persons", (request, response) => {
 
 
 app.post("/api/persons", (request, response) => {
-	const newPerson = {...request.body, "id": Math.floor((Math.random() * 1e9)).toString()}
+	const newPerson = request.body
 
-	const exists = persons.filter(person => person.name == newPerson.name).length > 0
+	// const exists = persons.filter(person => person.name == newPerson.name).length > 0
 
 	if (!newPerson.name || !newPerson.number) {
 		const error = {"error": "missing parameters"}
 		response.status(422).json(error)
 	}
-	else if (exists) {
-		const error = {"error": "name already exists"}
-		response.status(409).json(error)
-	}
+	// else if (exists) {
+	// 	const error = {"error": "name already exists"}
+	// 	response.status(409).json(error)
+	// }
 	else {
-		persons = persons.concat(newPerson)
-		response.json(newPerson)
+		person = new Person(newPerson)	
+		person.save().then(savedPerson => {
+			response.json(person)
+		})
 	}
 })
 
