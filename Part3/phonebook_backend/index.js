@@ -22,26 +22,30 @@ app.use(morgan(":method :url :status :res[content-length] - :response-time ms :b
 // _______________________________________
 
 
-app.get("/info", (request, response) => {
-	Person.find({}).then(people => {
-		const message = `Phonebook has info for ${people.length} people`
-		const now = new Date()
-		const time = now.toLocaleString()
+app.get("/info", (request, response, next) => {
+	Person.find({})
+		.then(people => {
+			const message = `Phonebook has info for ${people.length} people`
+			const now = new Date()
+			const time = now.toLocaleString()
 
-		response.write(`<div>${message}</div>`)
-		response.end(`<div>${time}</div>`)
-	})
+			response.write(`<div>${message}</div>`)
+			response.end(`<div>${time}</div>`)
+		})
+		.catch(error => next(error))
 })
 
 
-app.get("/api/persons", (request, response) => {
-	Person.find({}).then(people => {
-		response.json(people)
-	})	
+app.get("/api/persons", (request, response, next) => {
+	Person.find({})
+		.then(people => {
+			response.json(people)
+		})	
+		.catch(error => next(error))
 })
 
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
 	const newPerson = request.body
 
 	// const exists = persons.filter(person => person.name == newPerson.name).length > 0
@@ -63,28 +67,50 @@ app.post("/api/persons", (request, response) => {
 })
 
 
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response, next) => {
 	const id = request.params.id
 	// console.log(`Searching for id ${id}`)
-	Person.findById(id).then(foundPerson => {
-		if (foundPerson) {
-			response.json(foundPerson)
-		}
-		else {
-			response.status(404).end()
-		}
-	})
+	Person.findById(id)
+		.then(foundPerson => {
+			if (foundPerson) {
+				response.json(foundPerson)
+			}
+			else {
+				response.status(404).end()
+			}
+		})
+		.catch(error => next(error))
 })
 
 
-app.delete("/api/persons/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response, next) => {
 	const id = request.params.id
-	Person.findByIdAndDelete(id).then(res => {
-		response.status(204).end()
-	})
-
-	response.status(204).end()
+	Person.findByIdAndDelete(id)
+		.then(res => {
+			response.status(204).end()
+		})
+		.catch(error => next(error))
 })
+
+
+// _______________________________________
+
+
+// handle unknown endpoint
+const unknownEndpointHandler = (request, response) => {
+	response.status(404).json({error: "Unknown Endpoint"})
+}
+app.use(unknownEndpointHandler)
+
+
+// handle errors
+const errorHandler = (error, request, response, next) => {
+	if (error.name == "CastError") {
+		return response.status(400).json({error: "Invalid ID"})
+	}
+	next(error)
+}
+app.use(errorHandler)
 
 
 // _______________________________________
