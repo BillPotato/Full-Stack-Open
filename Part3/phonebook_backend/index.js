@@ -82,6 +82,20 @@ app.get("/api/persons/:id", (request, response, next) => {
 		.catch(error => next(error))
 })
 
+app.put("/api/persons/:id", (request, response, next) => {
+	const {name, number} = request.body
+	Person.findById(request.params.id)
+		.then(person => {
+			person.name = name
+			person.number = number
+
+			person.save().then(updatedPerson => {
+				response.json(updatedPerson)
+			})
+		})
+		.catch(error => next(error))
+})
+
 
 app.delete("/api/persons/:id", (request, response, next) => {
 	const id = request.params.id
@@ -105,6 +119,7 @@ app.use(unknownEndpointHandler)
 
 // handle errors
 const errorHandler = (error, request, response, next) => {
+	console.log(error)
 	if (error.name == "CastError") {
 		return response.status(400).json({error: "Invalid ID"})
 	}

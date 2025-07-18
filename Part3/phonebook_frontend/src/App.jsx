@@ -12,8 +12,7 @@ const App = () => {
   const [newName, setNewName] = useState("")
   const [newNumber, setNewNumber] = useState("")
   const [filter, setFilter] = useState("")
-  const [message, setMessage] = useState(null)
-  const [notiStatus, setNotiStatus] = useState(null)
+  const [notiStatus, setNotiStatus] = useState([null, null])
 
   useEffect(() => {
     console.log("effect")
@@ -26,11 +25,9 @@ const App = () => {
   }, [])
 
   const setTempMessage = (tempMessage, tempNotiStatus) => {
-    setMessage(tempMessage)
-    setNotiStatus(tempNotiStatus)
+    setNotiStatus([tempMessage, tempNotiStatus])
     setTimeout(() => {
-      setMessage(null)
-      setNotiStatus(null)
+      setNotiStatus([null, null])
     }, 5000)
   }
 
@@ -43,43 +40,44 @@ const App = () => {
     setNewNumber(event.target.value)
   }
 
-  const addPerson = (event) => {
+  const onAddPerson = (event) => {
     event.preventDefault()
 
-    const existedArray = persons.filter(person =>
-      person.name === newName
-      )
+    const existedPerson = persons.find(person => person.name == newName)
 
     const newObj = {
       name: newName,
       number: newNumber,
     }
 
-    if (existedArray.length === 0) {
-      
+    if (!existedPerson) {
       numberService
         .create(newObj)
         .then(newPerson => {
+          console.log(`created new person ${newPerson.id}`)
           setPersons(persons.concat(newPerson))
           setNewName("")
           setNewNumber("")
-          setTempMessage(`Person ${newPerson.name} was successfully added!`, "success")
+          setTempMessage(`${newPerson.name} successfully added!`, "success")
         })
 
-    } else {
-      const existedPerson = existedArray[0]
+    } 
+    else if (existedPerson) {
       const confirmed = window.confirm(`Do you want to replace ${existedPerson.name}'s Number?`)
       if (confirmed) {
         numberService
           .update(existedPerson.id, newObj)
           .then(updatedPerson => {
+            console.log(`updated person ${updatedPerson.id}`)
             setPersons(persons.map(person =>
               (person.id) === (updatedPerson.id) ? updatedPerson : person
             ))
             setNewName("")
             setNewNumber("")
+            setTempMessage(`${updatedPerson.name} successfully updated!`, "success")
           })
           .catch(error => {
+            console.log(error)
             setTempMessage(`Person ${existedPerson.name} is no longer in server`, "error")
             setPersons(persons.filter(person => person.id !== existedPerson.id))
             setNewName("")
@@ -89,14 +87,15 @@ const App = () => {
     }
   }
 
-  const deletePerson = (id, name) => {
+  const onDeletePerson = (id, name) => {
     const confirmed = window.confirm(`Do you want to delete ${name}'s number?`)
 
     if (confirmed) {
       numberService
         .del(id)
-        .then(deletedPerson => {
-          setPersons(persons.filter(person => person.id !== deletedPerson.id))
+        .then(deletedPerson => { // deletedPerson should be empty
+          console.log("deleted person in server")
+          setPersons(persons.filter(person => person.id !== id))
         })
     }
   }
@@ -113,18 +112,18 @@ const App = () => {
   return (
     <>
       <h2>Phonebook</h2>
-      <Notification className={notiStatus} message={message} />
+      <Notification className={notiStatus[1]} message={notiStatus[0]} />
       <Filter value={filter} onChange={handleFilterChange} />
       <h2>add new stuff</h2>
       <Form 
         nameValue={newName} onNameChange={handleNameChange}
         numberValue={newNumber} onNumberChange={handleNumberChange}
-        onSubmit={addPerson}
+        onSubmit={onAddPerson}
       />
       <h2>Numbers</h2>
       <Numbers 
         displayPersons={filteredArray}
-        deleteFunction={deletePerson} 
+        deleteFunction={onDeletePerson} 
       />
     </>
   )
