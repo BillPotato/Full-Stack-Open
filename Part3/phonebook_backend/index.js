@@ -60,9 +60,11 @@ app.post("/api/persons", (request, response, next) => {
 	// }
 	else {
 		person = new Person(newPerson)	
-		person.save().then(savedPerson => {
-			response.json(person)
-		})
+		person.save()
+			.then(savedPerson => {
+				response.json(person)
+			})
+			.catch(error => next(error))
 	}
 })
 
@@ -119,9 +121,12 @@ app.use(unknownEndpointHandler)
 
 // handle errors
 const errorHandler = (error, request, response, next) => {
-	console.log(error)
+	// console.log(error.message)
 	if (error.name == "CastError") {
 		return response.status(400).json({error: "Invalid ID"})
+	}
+	if (error.name == "ValidationError") {
+		return response.status(400).json({error: error.message})
 	}
 	next(error)
 }

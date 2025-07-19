@@ -60,6 +60,10 @@ const App = () => {
           setNewNumber("")
           setTempMessage(`${newPerson.name} successfully added!`, "success")
         })
+        .catch(error => {
+          const errorMessage = error.response.data.error
+          setTempMessage(errorMessage, "error")
+        })
 
     } 
     else if (existedPerson) {
