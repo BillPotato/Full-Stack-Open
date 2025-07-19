@@ -22,7 +22,15 @@ const personSchema = new mongoose.Schema({
 		minLength: 3,
 		required: true,
 	},
-	number: String,
+	number: {
+		type: String,
+		minLength: 8,
+		required: true,
+		validate: number => {
+			const pattern = /^\d{2,3}-\d+/
+			return pattern.test(number)
+		}
+	}
 })
 
 personSchema.set("toJSON", {
