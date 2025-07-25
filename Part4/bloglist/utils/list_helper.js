@@ -1,4 +1,5 @@
 const _ = require("lodash")
+const logger = require("../utils/logger.js")
 
 const dummy = (blogs) => {
 	return 1
@@ -29,6 +30,7 @@ const favouriteBlog = (blogs) => {
 const mostBlogs = (blogs) => {
 	const groupedAuthors = _
 		.groupBy(blogs, "author")
+	// logger.info(groupedAuthors)
 
 	let M_author = null // string
 	let M_posts = null // number
@@ -48,9 +50,40 @@ const mostBlogs = (blogs) => {
 	return result
 }
 
+const mostLikes = (blogs) => {
+	const sumLikes = (posts) => {
+		return posts.reduce((sum, post) => sum + post.likes, 0)
+	}
+
+	const groupedAuthors = _
+		.groupBy(blogs, "author")
+	// logger.info(groupedAuthors)
+
+	let M_author = null // string
+	let M_likes = null // number
+
+	for (const [author, posts] of Object.entries(groupedAuthors)) {
+		// logger.info(posts)
+		// logger.info(author)
+		const likes = sumLikes(posts)
+		if (!M_author || M_likes < likes) {
+			M_author = author
+			M_likes = likes
+		}
+	}
+
+	const res = {
+		author: M_author,
+		likes: M_likes
+	}
+
+	return res
+}
+
 module.exports = {
 	dummy,
 	totalLikes,
 	favouriteBlog,
 	mostBlogs,
+	mostLikes,
 }
