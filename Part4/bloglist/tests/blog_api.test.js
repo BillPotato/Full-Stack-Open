@@ -56,6 +56,33 @@ test("Unique identifier is named id, not _id", async () => {
 	}
 })
 
+test("POST /api/blogs", async () => {
+	const blogToAdd = {
+		"title": "Sample 3",
+	    "author": "Bill Gates",
+	    "url": "https://idontknowhowtowriteurl3",
+	    "likes": 420,
+	}
+
+	// check response
+	const postResponse = await api
+		.post("/api/blogs")
+		.send(blogToAdd)
+		.expect(201)
+		.expect("Content-Type", /application\/json/)
+
+	// check one new note
+	const response = await api.get("/api/blogs")
+	const blogs = response.body
+
+	assert.strictEqual(blogs.length, initialBlogs.length+1)
+
+	// check title
+	const titles = blogs.map(blog => blog.title)	
+
+	assert(titles.includes(blogToAdd.title))
+})
+
 after(async () => {
 	await mongoose.connection.close()
 })
