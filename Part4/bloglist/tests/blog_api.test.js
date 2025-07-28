@@ -94,14 +94,47 @@ test("Blogs have default like of 0", async () => {
 		.post("/api/blogs")	
 		.send(blogToAdd)
 
-	const newBlog = await Blog.find({
+	const newBlogList = await Blog.find({
 		"title": "Sample 4",
 	    "author": "Bill Gamer",
 	    "url": "https://idontknowhowtowriteurl4",
 	})
 	// logger.info(newBlog)
 
-	assert.strictEqual(newBlog[0].likes, 0)
+	assert.strictEqual(newBlogList[0].likes, 0)
+})
+
+test("Missing title or url results in code 400", async () => {
+	const blogsToAdd = [
+		{
+		    "author": "Bill1",
+		    "url": "https://idontknowhowtowriteurl4",
+		    "likes": 1,
+		},
+		{
+			"title": "Sample 5",
+		    "author": "Bill2",
+		    "likes": 2,
+		},
+		{
+		    "author": "Bill3",
+		    "likes": 3,
+		}
+	]
+	
+	for (let blog of blogsToAdd) {
+		const response = await api
+			.post("/api/blogs")
+			.send(blog)
+			.expect(400) // add content checking
+			.expect({"error": "missing parameters"})
+
+		// logger.info(blog)
+
+		const blogInDBList = await Blog.find(blog)
+		// logger.info(blogInDBList)
+		assert(blogInDBList.length === 0)
+	}
 })
 
 after(async () => {
