@@ -83,6 +83,27 @@ test("POST /api/blogs", async () => {
 	assert(titles.includes(blogToAdd.title))
 })
 
+test("Blogs have default like of 0", async () => {
+	const blogToAdd = {
+		"title": "Sample 4",
+	    "author": "Bill Gamer",
+	    "url": "https://idontknowhowtowriteurl4",
+	}
+
+	await api
+		.post("/api/blogs")	
+		.send(blogToAdd)
+
+	const newBlog = await Blog.find({
+		"title": "Sample 4",
+	    "author": "Bill Gamer",
+	    "url": "https://idontknowhowtowriteurl4",
+	})
+	// logger.info(newBlog)
+
+	assert.strictEqual(newBlog[0].likes, 0)
+})
+
 after(async () => {
 	await mongoose.connection.close()
 })
