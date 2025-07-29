@@ -28,4 +28,20 @@ blogRouter.post('/', async (request, response) => {
   response.status(201).json(result)
 })
 
+blogRouter.delete("/:id", async (request, response) => {
+  const id = request.params.id
+
+  await Blog.findByIdAndDelete(id)
+  response.status(204).end()
+})
+
+const errorHandler = (error, request, response, next) => {
+  if (error.name === "CastError") {
+    return response.status(400).json({"error": "invalid ID"})
+  }
+
+  next(error)
+}
+blogRouter.use(errorHandler)
+
 module.exports = blogRouter
