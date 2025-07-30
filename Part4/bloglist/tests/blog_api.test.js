@@ -169,6 +169,37 @@ describe("With initial blogs", () => {
 			assert.strictEqual(blogsAfterDeletion.length, initialBlogs.length)
 		})
 	})
+
+	describe("PUT tests", () => {
+		// TODO: simplify	
+		test("Updating likes of a note", async () => {
+			const blogsInDb = await Blog.find({})
+
+			const blogToUpdate = blogsInDb[0].toJSON()
+			const { id, title, author, url, likes } = blogToUpdate
+
+			const updatedBlog = {
+				title,
+				author,
+				url,
+				"likes": 987654321,
+			}
+
+			const expectedBlog = {
+				...blogToUpdate,
+				"likes": 987654321,
+			}
+
+			await api
+				.put(`/api/blogs/${id}`)
+				.send(updatedBlog)
+				.expect(200)
+				.expect(expectedBlog)
+
+			const updatedBlogInDb = await Blog.findById(id)
+			assert.deepStrictEqual(updatedBlogInDb.toJSON(), expectedBlog)
+		})
+	})
 })
 
 after(async () => {
