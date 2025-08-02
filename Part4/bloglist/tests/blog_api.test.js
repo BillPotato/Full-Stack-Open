@@ -2,25 +2,11 @@ const supertest = require("supertest")
 const app = require("../app.js")
 const mongoose = require("mongoose")
 const Blog = require("../models/blog.js")
+const { initialBlogs, blogsInDb } = require("./test_helper.js")
 
 const { test, describe, after, beforeEach } = require("node:test")
 const assert = require("node:assert")
 const logger = require("../utils/logger.js")
-
-const initialBlogs = [
-	{
-		"title": "Sample 1",
-	    "author": "Bill",
-	    "url": "https://idontknowhowtowriteurl1",
-	    "likes": 12,
-	},
-	{
-		"title": "Sample 2",
-	    "author": "Billy",
-	    "url": "https://idontknowhowtowriteurl2",
-	    "likes": 50,
-	}
-]
 
 const api = supertest(app)
 
@@ -62,6 +48,8 @@ describe("With initial blogs", () => {
 
 	describe("POST tests", () => {
 		test("POST /api/blogs", async () => {
+			const blogsAtStart = await blogsInDb()
+
 			const blogToAdd = {
 				"title": "Sample 3",
 			    "author": "Bill Gates",
@@ -77,14 +65,11 @@ describe("With initial blogs", () => {
 				.expect("Content-Type", /application\/json/)
 
 			// check one new note
-			const response = await api.get("/api/blogs")
-			const blogs = response.body
-
-			assert.strictEqual(blogs.length, initialBlogs.length+1)
+			const blogsAtEnd = await blogsInDb()
+			assert.strictEqual(blogsAtEnd.length, blogsAtStart.length+1)
 
 			// check title
-			const titles = blogs.map(blog => blog.title)	
-
+			const titles = blogsAtEnd.map(blog => blog.title)	
 			assert(titles.includes(blogToAdd.title))
 		})
 
@@ -146,8 +131,8 @@ describe("With initial blogs", () => {
 	describe("DELETE tests", () => {
 		test("Deleting an existing blog", async () => {
 			// use data in db otherwise broken GET request can affect other tests
-			const blogs = await Blog.find({})
-			const id = blogs[0]._id
+			const blogsAtStart = await blogsInDb()
+			const id = blogsAtStart[0].id
 
 			await api
 				.delete(`/api/blogs/${id}`)
@@ -158,35 +143,27 @@ describe("With initial blogs", () => {
 		})
 
 		test("Deleting a nonexistent blog", async () => {
+			const blogsAtStart = await blogsInDb()
+
 			await api
 				.delete("/api/blogs/1")
 				.expect(400)
 				.expect({"error": "invalid ID"})
 
-			const blogsAfterDeletion = await Blog.find({})
+			const blogsAtEnd = await blogsInDb()
 			// logger.info(blogsAfterDeletion)
 
-			assert.strictEqual(blogsAfterDeletion.length, initialBlogs.length)
+			assert.deepStrictEqual(blogsAtEnd, blogsAtStart)
 		})
 	})
 
 	describe("PUT tests", () => {
-		// TODO: simplify	
 		test("Updating likes of a note", async () => {
-			const blogsInDb = await Blog.find({})
+			const blogsAtStart = await blogsInDb()
 
-			const blogToUpdate = blogsInDb[0].toJSON()
-			const { id, title, author, url, likes } = blogToUpdate
-
+			const id = blogsAtStart[0].id
 			const updatedBlog = {
-				title,
-				author,
-				url,
-				"likes": 987654321,
-			}
-
-			const expectedBlog = {
-				...blogToUpdate,
+				...blogsAtStart[0],
 				"likes": 987654321,
 			}
 
@@ -194,10 +171,10 @@ describe("With initial blogs", () => {
 				.put(`/api/blogs/${id}`)
 				.send(updatedBlog)
 				.expect(200)
-				.expect(expectedBlog)
+				.expect(updatedBlog)
 
 			const updatedBlogInDb = await Blog.findById(id)
-			assert.deepStrictEqual(updatedBlogInDb.toJSON(), expectedBlog)
+			assert.deepStrictEqual(updatedBlogInDb.toJSON(), updatedBlog)
 		})
 	})
 })
