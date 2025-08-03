@@ -1,11 +1,12 @@
 const { test, describe, beforeEach, after } = require("node:test")
 const assert = require("node:assert")
-const { initialUsers, usersInDb, deepStrictEqualWithoutId } = require("./user_api_helper.js")
+const { initialUsers, usersInDb, assertUsers } = require("./user_api_helper.js")
 const supertest = require("supertest")
-const mongoose = require("mongoose")
 
-const User = require("../models/User.js")
+const mongoose = require("mongoose")
+const User = require("../models/user.js")
 const app = require("../App.js")
+const bcrypt = require("bcrypt")
 
 const api = supertest(app)
 
@@ -14,7 +15,13 @@ describe("With some initial users", () => {
 		await User.deleteMany({})
 
 		for (let user of initialUsers) {
-			const userObj = new User(user)
+			const passwordHash = await bcrypt.hash(user.password, 2)
+			const userToAdd = {
+				username: user.username,
+				name: user.name,
+				passwordHash 
+			}
+			const userObj = new User(userToAdd)
 			await userObj.save()
 		}
 	})
@@ -28,13 +35,7 @@ describe("With some initial users", () => {
 			const users = response.body
 
 			for (let i = 0; i < initialUsers.length; i++) {
-				const user = initialUsers[i]
-				const userInDb = users[i]
-
-				delete user.password
-				delete userInDb.id
-
-				assert.deepStrictEqual(userInDb, user)
+				assertUsers(users[i], initialUsers[i])
 			}
 		})
 	})
@@ -55,21 +56,19 @@ describe("With some initial users", () => {
 				.expect(201)
 				.expect("Content-Type", /application\/json/)
 
-			delete newUser.password
-
 			// check response content
-			const userInResponse = response.body
-			deepStrictEqualWithoutId(userInResponse, newUser)
+			assertUsers(response.body, newUser)
 
 			// check db content
-			const users = await usersInDb()
-			const userInDb = users[users.length-1]
-			deepStrictEqualWithoutId(userInDb, newUser)
+			const usersAtEnd = await usersInDb()
+			const userInDb = usersAtEnd[usersAtEnd.length-1]
+			assertUsers(userInDb, newUser)
 
 		})
 
 
 		test("Missing password / username", async () => {
+			const usersAtStart = await usersInDb()
 			const userToAdd1 = {
 				name: "Bao",
 				password: "123"
@@ -85,7 +84,7 @@ describe("With some initial users", () => {
 				.expect(400)
 				.expect({error: "missing username/password"})
 			const usersAtEnd1 = await usersInDb()
-			assert.strictEqual(usersAtEnd1.length, initialUsers.length)
+			assert.deepStrictEqual(usersAtEnd1, usersAtStart)
 
 			await api
 				.post("/api/users")
@@ -93,11 +92,12 @@ describe("With some initial users", () => {
 				.expect(400)
 				.expect({error: "missing username/password"})
 			const usersAtEnd2 = await usersInDb()
-			assert.strictEqual(usersAtEnd2.length, initialUsers.length)	
+			assert.deepStrictEqual(usersAtEnd2, usersAtStart)	
 		})
 
 
 		test("Too short password / username", async () => {
+			const usersAtStart = await usersInDb()
 			const userToAdd1 = {
 				username: "bi",
 				name: "Bao",
@@ -114,18 +114,19 @@ describe("With some initial users", () => {
 				.send(userToAdd1)
 				.expect(400)
 			const usersAtEnd1 = await usersInDb()
-			assert.strictEqual(usersAtEnd1.length, initialUsers.length)
+			assert.deepStrictEqual(usersAtEnd1, usersAtStart)
 
 			await api
 				.post("/api/users")
 				.send(userToAdd2)
 				.expect(400)
 			const usersAtEnd2 = await usersInDb()
-			assert.strictEqual(usersAtEnd2.length, initialUsers.length)
+			assert.deepStrictEqual(usersAtEnd2, usersAtStart)
 		})
 
 
 		test("Duplicate username", async () => {
+			const usersAtStart = await usersInDb()
 			userToAdd = {
 				username: "billbill",
 				password: "567"
@@ -136,7 +137,7 @@ describe("With some initial users", () => {
 				.send(userToAdd)
 				.expect(400)
 			const usersAtEnd = await usersInDb()	
-			assert.strictEqual(initialUsers.length, usersAtEnd.length)
+			assert.deepStrictEqual(usersAtEnd, usersAtStart)
 		})
 	})
 })
