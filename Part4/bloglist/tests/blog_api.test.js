@@ -2,7 +2,7 @@ const supertest = require("supertest")
 const app = require("../app.js")
 const mongoose = require("mongoose")
 const Blog = require("../models/blog.js")
-const { initialBlogs, blogsInDb } = require("./test_helper.js")
+const { initialBlogs, blogsInDb } = require("./blog_api_helper.js")
 
 const { test, describe, after, beforeEach } = require("node:test")
 const assert = require("node:assert")
