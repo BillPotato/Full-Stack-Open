@@ -44,7 +44,16 @@ blogRouter.post('/', async (request, response) => {
 })
 
 blogRouter.delete("/:id", async (request, response) => {
-  const id = request.params.id
+  const token = request.token
+  const decodedToken = jwt.verify(token, process.env.SECRET)
+  
+  const user = await User.findById(decodedToken.id)
+  const userBlogs = user.blogs.map(blog => blog.toString())
+  const id = request.params.id // noteId
+
+  if (!userBlogs.includes(id)) {
+    return response.status(401).json({ error: "user did not create note" })
+  }
 
   await Blog.findByIdAndDelete(id)
   response.status(204).end()
