@@ -13,6 +13,10 @@ blogRouter.get('/', async (request, response) => {
 blogRouter.post('/', async (request, response) => {
   const user = request.user
 
+  if (!user) {
+    return response.status(401).json({ error: "invalid token" })
+  }
+
   const blogToAdd = {
     ...request.body,
     author: user.username
@@ -42,6 +46,10 @@ blogRouter.post('/', async (request, response) => {
 blogRouter.delete("/:id", async (request, response) => {
 
   const user = request.user
+
+  if (!user) {
+    return response.status(401).json({ error: "invalid token" })
+  }
 
   // check if user created blog with requested id 
   const userBlogIds = user.blogs.map(blogObjId => blogObjId.toString())
