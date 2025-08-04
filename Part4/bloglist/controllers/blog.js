@@ -11,10 +11,7 @@ blogRouter.get('/', async (request, response) => {
 })
 
 blogRouter.post('/', async (request, response) => {
-  const token = request.token
-  const decodedToken = jwt.verify(token, process.env.SECRET)
-
-  const user = await User.findById(decodedToken.id)
+  const user = request.user
 
   const blogToAdd = {
     ...request.body,
@@ -31,12 +28,11 @@ blogRouter.post('/', async (request, response) => {
     blogToAdd.likes = 0
   }
 
+  // save blog
   const blog = new Blog(blogToAdd)
-
   const savedBlog = await blog.save()
 
   // save blog to user
-  
   user.blogs = user.blogs.concat(savedBlog)
   await user.save()
 
@@ -44,18 +40,23 @@ blogRouter.post('/', async (request, response) => {
 })
 
 blogRouter.delete("/:id", async (request, response) => {
-  const token = request.token
-  const decodedToken = jwt.verify(token, process.env.SECRET)
-  
-  const user = await User.findById(decodedToken.id)
-  const userBlogs = user.blogs.map(blog => blog.toString())
-  const id = request.params.id // noteId
 
-  if (!userBlogs.includes(id)) {
+  const user = request.user
+
+  // check if user created blog with requested id 
+  const userBlogIds = user.blogs.map(blogObjId => blogObjId.toString())
+  const deleteId = request.params.id
+
+  if (!userBlogIds.includes(deleteId)) {
     return response.status(401).json({ error: "user did not create note" })
   }
 
-  await Blog.findByIdAndDelete(id)
+  // delete blog from user
+  user.blogs = user.blogs.filter(blogObjId => blogObjId.toString() != deleteId)
+  await user.save()
+
+  // delete blog
+  await Blog.findByIdAndDelete(deleteId)
   response.status(204).end()
 })
 
