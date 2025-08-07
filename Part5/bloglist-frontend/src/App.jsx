@@ -5,6 +5,7 @@ import loginService from "./services/login.js"
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
+  const [notificationStatus, setNotificationStatus] = useState([]) // [0]: message [1]: className
   // user
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState("")
@@ -28,6 +29,15 @@ const App = () => {
     }
   }, [])
 
+  // util functions
+  const setNotification = ( message, style ) => {
+    setNotificationStatus([message, style])
+
+    setTimeout(() => {
+      setNotificationStatus([])
+    }, 3000)
+  }
+
   // handlers
   const onUsernameChange = (event) => {
     const newUsername = event.target.value
@@ -39,6 +49,7 @@ const App = () => {
     setPassword(newPassword)
   }
 
+  // forms
   const onLogin = async (event) => {
     event.preventDefault()
 
@@ -59,8 +70,11 @@ const App = () => {
       setPassword("")
       setUser(user) 
       blogService.setToken(user.token)
+
+      setNotification("login success", "success")
     }
     catch ( exception ) {
+      setNotification("login failed", "error")
       console.log(exception)
     }
   }
@@ -68,28 +82,47 @@ const App = () => {
   const onLogout = (event) => {
     setUser(null)
     window.localStorage.removeItem("localUser")
+    setNotification("logout success", "success")
   }
 
   const onCreateBlog = async (event) => {
     event.preventDefault()
 
-    const newBlog = {
-      title,
-      author: user.username,
-      url,
-      likes: 0
-    }
+    try {
+      const newBlog = {
+        title,
+        author: user.username,
+        url,
+        likes: 0
+      }
 
-    const returnedBlog = await blogService.create(newBlog)
-    setBlogs(blogs.concat(returnedBlog))
-    setTitle("")
-    setUrl("")
+      const returnedBlog = await blogService.create(newBlog)
+      setBlogs(blogs.concat(returnedBlog))
+      setTitle("")
+      setUrl("")
+      setNotification("blog creation success", "success")
+    }
+    catch (exception) {
+      setNotification("blog creation failed", "error")
+      console.log(exception)
+    }
+  }
+
+  const notificationForm = () => {
+    if (!notificationStatus[0]) return null
+
+    return (
+      <div className={notificationStatus[1]}>
+        {notificationStatus[0]}
+      </div>
+    )
   }
 
   const loginForm = () => {
     return (
       <form onSubmit = {onLogin}>
         <h1>login</h1>
+        {notificationForm()}
         <div>
           <span>username: </span>
           <input
@@ -117,6 +150,7 @@ const App = () => {
     return (
       <div>
         <h2>blogs</h2>
+        {notificationForm()}
         <div>
           logged in as {user.username}
           <button onClick = {onLogout}>
