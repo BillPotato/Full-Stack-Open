@@ -15,6 +15,14 @@ const App = () => {
     )  
   }, [])
 
+  useEffect(() => {
+    const localUser = JSON.parse(window.localStorage.getItem("localUser"))
+
+    if (localUser) {
+      setUser(localUser)
+    }
+  }, [])
+
   // handlers
   const onUsernameChange = (event) => {
     const newUsername = event.target.value
@@ -26,9 +34,8 @@ const App = () => {
     setPassword(newPassword)
   }
 
-  const onLoginSubmit = async (event) => {
+  const onLogin = async (event) => {
     event.preventDefault()
-
 
     try {
       const credentials = {
@@ -38,18 +45,27 @@ const App = () => {
 
       const user = await loginService.login(credentials)
 
+      window.localStorage.setItem(
+        "localUser",
+        JSON.stringify(user)
+      )
+
+      setUsername("")
+      setPassword("")
       setUser(user) 
     }
     catch ( exception ) {
-      setUsername("")
-      setPassword("")
       console.log("Invalid credentials")
     }
   }
 
+  const onLogout = (event) => {
+    setUser(null)
+  }
+
   const loginForm = () => {
     return (
-      <form onSubmit = {onLoginSubmit}>
+      <form onSubmit = {onLogin}>
         <h1>login</h1>
         <div>
           <span>username: </span>
@@ -78,7 +94,12 @@ const App = () => {
     return (
       <div>
         <h2>blogs</h2>
-        <div>logged in as {user.username}</div>
+        <div>
+          logged in as {user.username}
+          <button onClick = {onLogout}>
+            logout
+          </button>
+        </div>
         <br></br>
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
