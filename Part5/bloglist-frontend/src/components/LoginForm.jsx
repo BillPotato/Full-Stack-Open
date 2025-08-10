@@ -1,9 +1,5 @@
-import NotificationForm from "./NotificationForm"
-
 const LoginForm = ({
   onLogin,
-  notiMessage,
-  notiStatus,
   username,
   onUsernameChange,
   password,
@@ -12,10 +8,6 @@ const LoginForm = ({
   return (
     <form onSubmit = {onLogin}>
       <h1>login</h1>
-      <NotificationForm 
-        message={notiMessage}
-        status={notiStatus}
-      />
       <div>
         <span>username: </span>
         <input

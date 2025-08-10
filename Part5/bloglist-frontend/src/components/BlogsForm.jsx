@@ -1,54 +1,59 @@
-import NotificationForm from "./NotificationForm"
+import { useState, useEffect } from "react"
+
 import Blog from "./Blog"
+import Togglable from "./Togglable"
 
 const BlogsForm = ({
-	notiMessage,
-	notiStatus,
-	displayName,
-	onLogout,
-	onCreateBlog,
-	title,
-	onTitleChange,
-	url,
-	onUrlChange,
-	blogs
+	createBlog,
 }) => {
+
+	// states
+	const [title, setTitle] = useState("")
+	const [url, setUrl] = useState("")
+
+	// handlers
+	const onCreateBlog = (event) => {
+		event.preventDefault()
+		createBlog({
+			title,
+			url
+		})
+		setTitle("")
+		setUrl("")
+	}
+
+	const onTitleChange = (event) => {
+		setTitle(event.target.value)
+	}
+
+	const onUrlChange = (event) => {
+		setUrl(event.target.value)
+	}
+
     return (
       <div>
-        <h2>blogs</h2>
-        <NotificationForm 
-          message={notiMessage}
-          status={notiStatus}
-        />
-        <div>
-          logged in as {displayName}
-          <button onClick = {onLogout}>
-            logout
-          </button>
-        </div>
-        <h1>create new</h1>
-        <form onSubmit={onCreateBlog}>
-          <div>
-            title: 
-            <input 
-              type="text" 
-              value={title}
-              onChange={onTitleChange} 
-            />
-          </div>
-          <div>
-            url: 
-            <input 
-              type="text"
-              value={url}
-              onChange={onUrlChange} 
-            />
-          </div>
-          <button type="submit">create</button>
-        </form>
-        {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
-        )}
+        <Togglable buttonLabel="create blog">
+	        <h1>create new</h1>
+	        <form onSubmit={onCreateBlog}>
+	          <div>
+	            title: 
+	            <input 
+	              type="text" 
+	              value={title}
+	              onChange={onTitleChange} 
+	            />
+	          </div>
+	          <div>
+	            url: 
+	            <input 
+	              type="text"
+	              value={url}
+	              onChange={onUrlChange} 
+	            />
+	          </div>
+	          <button type="submit">create</button>
+	        </form>
+      	</Togglable>
       </div>
     )
 }
