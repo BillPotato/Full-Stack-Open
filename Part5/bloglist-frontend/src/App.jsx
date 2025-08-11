@@ -106,8 +106,19 @@ const App = () => {
     }
   }
 
-  const onLike = (blog) => {
+  const onLike = (blogToUpdate) => {
+    const newBlog = {
+      ...blogToUpdate,
+      likes: blogToUpdate.likes+1
+    }
 
+    const updatedBlog = blogService
+      .put(blogToUpdate.id, newBlog)
+
+    const updatedBlogs = blogs.map(blog => 
+      blog.id == blogToUpdate.id ? newBlog : blog
+    )
+    setBlogs(updatedBlogs)
   }
 
   return (

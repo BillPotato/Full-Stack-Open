@@ -23,8 +23,20 @@ const create = (newBlog) => {
   return request.then(response => response.data)
 }
 
+const put = (id, newBlog) => {
+  const config = {
+    headers: {
+      Authorization: token,
+    }
+  }
+
+  const request = axios.put(`${baseUrl}/${id}`, newBlog, config)
+  return request.then(response => response.data)
+}
+
 export default { 
+  setToken,
   getAll,
   create,
-  setToken
+  put
 }

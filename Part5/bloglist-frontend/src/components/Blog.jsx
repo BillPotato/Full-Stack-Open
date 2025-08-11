@@ -6,6 +6,7 @@ const Blog = ({ blog, onLike }) => {
 
   // handlers
   const handleLike = (event) => {
+    // console.log(blog)
     onLike(blog)
   }
 
@@ -32,7 +33,7 @@ const Blog = ({ blog, onLike }) => {
         <div>
           likes: {blog.likes}
           <button
-            onClick={onLike}
+            onClick={handleLike}
           >like</button>
         </div>
       </div>
