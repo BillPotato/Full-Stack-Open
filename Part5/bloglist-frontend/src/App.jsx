@@ -106,6 +106,10 @@ const App = () => {
     }
   }
 
+  const onLike = (blog) => {
+
+  }
+
   return (
     <div>
       <NotificationForm
@@ -137,7 +141,11 @@ const App = () => {
           />
           <ul>
             {blogs.map(blog =>
-              <Blog key={blog.id} blog={blog} />)
+              <Blog 
+                key={blog.id} 
+                blog={blog} 
+                onLike={onLike}
+              />)
             }
           </ul>
         </div>
