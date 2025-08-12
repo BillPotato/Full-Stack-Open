@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
-import Blog from './components/Blog'
-import blogService from './services/blogs'
+import { useState, useEffect } from "react"
+import Blog from "./components/Blog"
+import blogService from "./services/blogs"
 import loginService from "./services/login.js"
 
 import NotificationForm from "./components/NotificationForm"
@@ -71,7 +71,7 @@ const App = () => {
 
       setUsername("")
       setPassword("")
-      setUser(user) 
+      setUser(user)
       blogService.setToken(user.token)
 
       setNotification("login success", "success")
@@ -116,8 +116,8 @@ const App = () => {
     const updatedBlog = blogService
       .put(blogToUpdate.id, newBlog)
 
-    const updatedBlogs = blogs.map(blog => 
-      blog.id == blogToUpdate.id ? newBlog : blog
+    const updatedBlogs = blogs.map(blog =>
+      blog.id === blogToUpdate.id ? newBlog : blog
     )
     setBlogs(updatedBlogs)
   }
@@ -138,8 +138,8 @@ const App = () => {
         status={notificationStatus[1]}
       />
       {
-        !user && 
-        <LoginForm 
+        !user &&
+        <LoginForm
           onLogin={onLogin}
           username={username}
           onUsernameChange={onUsernameChange}
@@ -148,7 +148,7 @@ const App = () => {
         />
       }
       {
-        user && 
+        user &&
         <div>
           <h2>blogs</h2>
           <div>
@@ -157,15 +157,15 @@ const App = () => {
           </div>
           <BlogsForm
             user={user}
-            createBlog={createBlog} 
+            createBlog={createBlog}
             onLogout={onLogout}
           />
           <ul>
             {blogs.map(blog =>
-              <Blog 
-                key={blog.id} 
+              <Blog
+                key={blog.id}
                 user={user}
-                blog={blog} 
+                blog={blog}
                 onLike={onLike}
                 onDelete={onDelete}
               />)

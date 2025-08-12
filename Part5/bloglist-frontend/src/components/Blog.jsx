@@ -19,20 +19,20 @@ const Blog = ({ user, blog, onLike, onDelete }) => {
   // display if blog is created by logged in user
   const showIfUser = { display: blog.user.toString() === user.id ? "" : "none" }
 
-  return (  
+  return (
     <div>
       <div className="blog" style={hideWhenVisible}>
         {blog.title} {blog.author}
         <button
-          onClick={()=>setVisible(true)}
+          onClick={() => setVisible(true)}
         >view</button>
-      </div>  
+      </div>
 
       <div className="blog" style={showWhenVisible}>
         <div>
           {blog.title} {blog.author}
           <button
-            onClick={()=>setVisible(false)}
+            onClick={() => setVisible(false)}
           >hide</button>
         </div>
         <div>url: {blog.url}</div>
