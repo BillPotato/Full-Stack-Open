@@ -19,7 +19,8 @@ blogRouter.post('/', async (request, response) => {
 
   const blogToAdd = {
     ...request.body,
-    author: user.username
+    author: user.username,
+    user: user._id
   }
 
   // check title & url

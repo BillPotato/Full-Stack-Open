@@ -34,9 +34,21 @@ const put = (id, newBlog) => {
   return request.then(response => response.data)
 }
 
+const del = (id) => {
+  const config = {
+    headers: {
+      Authorization: token,
+    }
+  }
+
+  const request = axios.delete(`${baseUrl}/${id}`, config)
+  return request.then(response => response.data)
+}
+
 export default { 
   setToken,
   getAll,
   create,
-  put
+  put,
+  del
 }

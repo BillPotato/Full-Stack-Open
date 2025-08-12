@@ -122,6 +122,15 @@ const App = () => {
     setBlogs(updatedBlogs)
   }
 
+  const onDelete = (blogToDelete) => {
+    if (!window.confirm(`Delete "${blogToDelete.title}" by "${blogToDelete.author}"?`)) return
+    blogService
+      .del(blogToDelete.id)
+      .then((response) => {
+        setBlogs(blogs.filter((blog => blog.id !== blogToDelete.id)))
+      })
+  }
+
   return (
     <div>
       <NotificationForm
@@ -155,8 +164,10 @@ const App = () => {
             {blogs.map(blog =>
               <Blog 
                 key={blog.id} 
+                user={user}
                 blog={blog} 
                 onLike={onLike}
+                onDelete={onDelete}
               />)
             }
           </ul>

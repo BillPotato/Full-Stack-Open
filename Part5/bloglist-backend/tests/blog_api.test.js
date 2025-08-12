@@ -19,8 +19,10 @@ describe("With initial blogs", async () => {
 	beforeEach(async () => {
 		await Blog.deleteMany({})
 		const admin = await User.findOne({username: "Admin"})
+		admin.blogs = []
 
 		for (let blog of initialBlogs) {
+			blog.user = admin._id
 			const blogObject = Blog(blog)
 			const savedBlog = await blogObject.save()
 
