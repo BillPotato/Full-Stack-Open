@@ -2,6 +2,10 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from '../Blog'
 
+
+let mockLikeHandler
+let mockDeleteHandler
+
 beforeEach(() => {
   const user = {
     "username": "",
@@ -18,9 +22,10 @@ beforeEach(() => {
     "id": ""
   }
 
-  const mockHandler = vi.fn()
+  mockLikeHandler = vi.fn()
+  mockDeleteHandler = vi.fn()
 
-  render(<Blog user={user} blog={blog} onLike={mockHandler} onDelete={mockHandler} />)
+  render(<Blog user={user} blog={blog} onLike={mockLikeHandler} onDelete={mockDeleteHandler} />)
 })
 
 
@@ -52,4 +57,20 @@ test("url and likes are displated when \"view\" button is clicked", async () => 
   expect(url).toBeVisible()
   const likes = screen.getByText("likes", {"exact": false})
   expect(likes).toBeVisible()
+})
+
+
+test("like handler is triggered twice if like button is pressed twice", async () => {
+
+  // click view button
+  const testUser = userEvent.setup()
+  const viewButton = screen.getByText("view")
+  testUser.click(viewButton)
+
+  // click like button twice
+  const likeButton = screen.getByText("like")
+  await testUser.click(likeButton)
+  await testUser.click(likeButton)
+
+  expect(mockLikeHandler.mock.calls).toHaveLength(2)
 })
