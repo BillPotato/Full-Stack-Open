@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Blog from '../Blog'
 
-test("renders title and author only when not visible", () => {
+beforeEach(() => {
   const user = {
     "username": "",
     "id": "",
@@ -9,17 +10,21 @@ test("renders title and author only when not visible", () => {
   }
 
   const blog = {
-        "title": "title",
-        "author": "author",
-        "url": "",
-        "likes": 0,
-        "user": "",
-        "id": ""
-    }
+    "title": "title",
+    "author": "author",
+    "url": "",
+    "likes": 0,
+    "user": "",
+    "id": ""
+  }
 
-    const mockHandler = vi.fn()
+  const mockHandler = vi.fn()
 
   render(<Blog user={user} blog={blog} onLike={mockHandler} onDelete={mockHandler} />)
+})
+
+
+test("renders title and author only when not visible", () => {
 
   // check title and author are displayed
   const title = screen.getAllByText("title", {"exact": false})
@@ -32,4 +37,19 @@ test("renders title and author only when not visible", () => {
   expect(url).not.toBeVisible()
   const likes = screen.getByText("likes", {"exact": false})
   expect(likes).not.toBeVisible()
+})
+
+
+test("url and likes are displated when \"view\" button is clicked", async () => {
+
+  // click button
+  const testUser = userEvent.setup()
+  const viewButton = screen.getByText("view")
+  await testUser.click(viewButton)
+
+  // check url and likes are displayed
+  const url = screen.getByText("url", {"exact": false})
+  expect(url).toBeVisible()
+  const likes = screen.getByText("likes", {"exact": false})
+  expect(likes).toBeVisible()
 })
