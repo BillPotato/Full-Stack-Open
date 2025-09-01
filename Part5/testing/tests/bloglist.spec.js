@@ -87,5 +87,14 @@ describe('Blog app', () => {
       await expect(page.getByText("likes: 1", {exact: false})).toBeVisible()
     })
 
+    test("blog can be deleted", async ({ page }) => {
+      // accept dialog on appearance
+      page.on("dialog", (dialog) => dialog.accept())
+
+      await page.getByRole("button", {name: "view"}).click()
+      await page.getByRole("button", {name: "delete"}).click()
+
+      await expect(page.getByText("Note1 Adminview")).not.toBeVisible()
+    })
   })
 })
