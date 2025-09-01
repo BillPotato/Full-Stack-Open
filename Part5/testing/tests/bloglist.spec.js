@@ -1,11 +1,43 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
 
 describe('Blog app', () => {
-  beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:5173')
-  })
+  describe("without anything in database", () => {
+    beforeEach(async ({ page, request }) => {
+      await page.goto('http://localhost:5173')
 
-  test('Login form is shown', async ({ page }) => {
-    await expect(page.getByText("login")).toBeVisible()
+      // delete everything in database
+      await request.post("http://localhost:5173/api/reset")
+      // add admin user in database
+      await request.post("http://localhost:5173/api/users", {
+        data: {
+          username: "Admin",
+          password: "123"
+        }
+      })
+
+    })
+
+    test('Login form is shown', async ({ page }) => {
+      await expect(page.getByText("login")).toBeVisible()
+    })
+
+    describe("login", () => {
+      test("is successful with correct credentials", async ({ page }) => {
+        await page.getByTestId("username").fill("Admin")
+        await page.getByTestId("password").fill("123")
+        await page.getByTestId("submit").click()
+
+        await expect(page.getByText("logged in as", {exact: false})).toBeVisible()
+      })
+
+      test("fails with wrong credentials", async ({ page }) => {
+        await page.getByTestId("username").fill("Admin")
+        await page.getByTestId("password").fill("1234")
+        await page.getByTestId("submit").click()
+
+        await expect(page.getByText("logged in as", {exact: false})).not.toBeVisible()
+      })
+    })
+    
   })
 })
