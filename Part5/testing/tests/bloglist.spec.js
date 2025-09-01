@@ -97,4 +97,50 @@ describe('Blog app', () => {
       await expect(page.getByText("Note1 Adminview")).not.toBeVisible()
     })
   })
+
+
+  describe("with 2 users and 1 note in the database (logged in as user 2)", () => {
+    beforeEach(async ({ page, request }) => {
+      await page.goto('http://localhost:5173')
+
+      // delete everything in database
+      await request.post("http://localhost:5173/api/reset")
+      // add admin user in database
+      await request.post("http://localhost:5173/api/users", {
+        data: {
+          username: "Admin",
+          password: "123"
+        }
+      }) 
+      await request.post("http://localhost:5173/api/users", {
+        data: {
+          username: "Admin2",
+          password: "123"
+        }
+      }) 
+      // add a note in database
+      await page.getByTestId("username").fill("Admin")
+      await page.getByTestId("password").fill("123")
+      await page.getByTestId("submit").click()
+
+      await page.getByText("create blog").click()
+      await page.getByTestId("title").fill("Note1")
+      await page.getByTestId("url").fill("http://random")
+      await page.getByTestId("create").click() 
+
+      // log in as user 2
+      await page.getByRole("button", {name: "logout"}).click()
+      await page.getByTestId("username").fill("Admin2")
+      await page.getByTestId("password").fill("123")
+      await page.getByTestId("submit").click()
+    })
+
+
+    test("another user cannot delete one's blog", async ({ page }) => {
+      await page.on("dialog", (dialog) => dialog.accept())
+
+      await page.getByRole("button", {name: "view"}).click()
+      await expect(page.getByRole("button", {name: "delete"})).not.toBeVisible()
+    })
+  })
 })
