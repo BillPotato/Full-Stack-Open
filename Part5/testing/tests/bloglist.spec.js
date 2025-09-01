@@ -37,6 +37,20 @@ describe('Blog app', () => {
 
         await expect(page.getByText("logged in as", {exact: false})).not.toBeVisible()
       })
+
+      test("new note can be created" , async ({ page }) => {
+        await page.getByTestId("username").fill("Admin")
+        await page.getByTestId("password").fill("123")
+        await page.getByTestId("submit").click()
+
+        await page.getByText("create blog").click()
+        await page.getByTestId("title").fill("Note1")
+        await page.getByTestId("url").fill("http://random")
+        await page.getByTestId("create").click()
+
+        await expect(page.getByText("Note1 Adminview")).toBeVisible()
+      })
+
     })
     
   })
