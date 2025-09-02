@@ -1,4 +1,5 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
+const { loginWith, createBlog } = require("./helper.js")
 
 describe('Blog app', () => {
   describe("with 1 user in the database", () => {
@@ -23,30 +24,22 @@ describe('Blog app', () => {
 
     describe("login", () => {
       test("is successful with correct credentials", async ({ page }) => {
-        await page.getByTestId("username").fill("Admin")
-        await page.getByTestId("password").fill("123")
-        await page.getByTestId("submit").click()
+        await loginWith(page, "Admin", "123")
 
         await expect(page.getByText("logged in as", {exact: false})).toBeVisible()
       })
 
       test("fails with wrong credentials", async ({ page }) => {
-        await page.getByTestId("username").fill("Admin")
-        await page.getByTestId("password").fill("1234")
-        await page.getByTestId("submit").click()
+        await loginWith(page, "Admin", "1234")
 
         await expect(page.getByText("logged in as", {exact: false})).not.toBeVisible()
       })
 
-      test("new note can be created" , async ({ page }) => {
-        await page.getByTestId("username").fill("Admin")
-        await page.getByTestId("password").fill("123")
-        await page.getByTestId("submit").click()
+      test.only("new note can be created" , async ({ page }) => {
+        
+        await loginWith(page, "Admin", "123")
 
-        await page.getByText("create blog").click()
-        await page.getByTestId("title").fill("Note1")
-        await page.getByTestId("url").fill("http://random")
-        await page.getByTestId("create").click()
+        await createBlog(page, "Note1", "http://random")
 
         await expect(page.getByText("Note1 Adminview")).toBeVisible()
       })
@@ -71,14 +64,16 @@ describe('Blog app', () => {
         }
       }) 
       // add a note in database
-      await page.getByTestId("username").fill("Admin")
-      await page.getByTestId("password").fill("123")
-      await page.getByTestId("submit").click()
+      // await page.getByTestId("username").fill("Admin")
+      // await page.getByTestId("password").fill("123")
+      // await page.getByTestId("submit").click()
+      await loginWith(page, "Admin", "123")
 
-      await page.getByText("create blog").click()
-      await page.getByTestId("title").fill("Note1")
-      await page.getByTestId("url").fill("http://random")
-      await page.getByTestId("create").click()
+      // await page.getByText("create blog").click()
+      // await page.getByTestId("title").fill("Note1")
+      // await page.getByTestId("url").fill("http://random")
+      // await page.getByTestId("create").click()
+      await createBlog(page, "Note1", "http://random")
     })
 
     test("blog can be liked", async ({ page }) =>{
@@ -101,19 +96,15 @@ describe('Blog app', () => {
 
     test("blogs are sorted by likes", async ({ page }) => {
       // create 2 more blogs
-      await page.waitForTimeout(500)
-      await page.getByTestId("title").fill("Note2")
-      await page.getByTestId("url").fill("http://random2")
-      await page.getByTestId("create").click()
+      // await page.waitForTimeout(500)
+      await createBlog(page, "Note2", "http://random2") 
 
-      await page.waitForTimeout(500)
-      await page.getByTestId("title").fill("Note3")
-      await page.getByTestId("url").fill("http://random3")
-      await page.getByTestId("create").click()
+      // await page.waitForTimeout(500)
+      await createBlog(page, "Note3", "http://random3")
 
       await page.waitForTimeout(500)
       await page.goto('http://localhost:5173')
-      await page.waitForTimeout(500)
+      // await page.waitForTimeout(500)
       await page.pause()
 
       const blogs = await page.getByTestId("blog").all()
@@ -173,27 +164,31 @@ describe('Blog app', () => {
         }
       }) 
       // add a note in database
-      await page.getByTestId("username").fill("Admin")
-      await page.getByTestId("password").fill("123")
-      await page.getByTestId("submit").click()
+      // await page.getByTestId("username").fill("Admin")
+      // await page.getByTestId("password").fill("123")
+      // await page.getByTestId("submit").click()
+      await loginWith(page, "Admin", "123")
 
-      await page.getByText("create blog").click()
-      await page.getByTestId("title").fill("Note1")
-      await page.getByTestId("url").fill("http://random")
-      await page.getByTestId("create").click() 
+      // await page.getByText("create blog").click()
+      // await page.getByTestId("title").fill("Note1")
+      // await page.getByTestId("url").fill("http://random")
+      // await page.getByTestId("create").click() 
+      await createBlog(page, "Note1", "http://random")
 
       await page.waitForTimeout(50)
 
       // log in as user 2
       await page.getByRole("button", {name: "logout"}).click()
-      await page.getByTestId("username").fill("Admin2")
-      await page.getByTestId("password").fill("123")
-      await page.getByTestId("submit").click()
+      // await page.getByTestId("username").fill("Admin2")
+      // await page.getByTestId("password").fill("123")
+      // await page.getByTestId("submit").click()
+      await loginWith(page, "Admin2", "123")
 
-      await page.getByRole("button", {name: "create blog"}).click()
-      await page.getByTestId("title").fill("Note2")
-      await page.getByTestId("url").fill("http://random2")
-      await page.getByTestId("create").click() 
+      // await page.getByRole("button", {name: "create blog"}).click()
+      // await page.getByTestId("title").fill("Note2")
+      // await page.getByTestId("url").fill("http://random2")
+      // await page.getByTestId("create").click() 
+      await createBlog(page, "Note2", "http://random2")
     })
 
 
