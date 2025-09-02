@@ -3,10 +3,10 @@ const { test, expect, beforeEach, describe } = require('@playwright/test')
 describe('Blog app', () => {
   describe("with 1 user in the database", () => {
     beforeEach(async ({ page, request }) => {
-      await page.goto('http://localhost:5173')
-
       // delete everything in database
       await request.post("http://localhost:5173/api/reset")
+      // go to page      
+      await page.goto('http://localhost:5173')
       // add admin user in database
       await request.post("http://localhost:5173/api/users", {
         data: {
@@ -58,10 +58,11 @@ describe('Blog app', () => {
 
   describe("with 1 user and 1 note in the database", () => {
     beforeEach(async ({ page, request }) => {
-      await page.goto('http://localhost:5173')
 
       // delete everything in database
       await request.post("http://localhost:5173/api/reset")
+      // go to page
+      await page.goto('http://localhost:5173')
       // add admin user in database
       await request.post("http://localhost:5173/api/users", {
         data: {
@@ -96,15 +97,68 @@ describe('Blog app', () => {
 
       await expect(page.getByText("Note1 Adminview")).not.toBeVisible()
     })
+
+
+    test("blogs are sorted by likes", async ({ page }) => {
+      // create 2 more blogs
+      await page.waitForTimeout(500)
+      await page.getByTestId("title").fill("Note2")
+      await page.getByTestId("url").fill("http://random2")
+      await page.getByTestId("create").click()
+
+      await page.waitForTimeout(500)
+      await page.getByTestId("title").fill("Note3")
+      await page.getByTestId("url").fill("http://random3")
+      await page.getByTestId("create").click()
+
+      await page.waitForTimeout(500)
+      await page.goto('http://localhost:5173')
+      await page.waitForTimeout(500)
+      await page.pause()
+
+      const blogs = await page.getByTestId("blog").all()
+
+      // like the blogs
+      let cur_like = 1
+      for (let blogElem of blogs) {
+        await blogElem.getByRole("button", {name: "view"}).click()
+        for (let i = 0; i < cur_like; i++) {
+          await page.waitForTimeout(200)
+          await blogElem.getByRole("button", {name: "like"}).click()
+        }
+        cur_like++
+      }
+
+      await page.waitForTimeout(500)
+      await page.goto('http://localhost:5173')
+      await page.waitForTimeout(500)
+      await page.pause()
+
+      for (let blogElem of blogs) {
+        await page.waitForTimeout(500)
+        await blogElem.getByRole("button", {name: "view"}).click()
+      }
+
+      let likeTexts = []
+      for (let blogElem of blogs) {
+        likeTexts.push(await blogElem.getByText("likes: ", {exact: false}).textContent())
+      }
+      const likes = likeTexts.map(likeText => likeText.replace("likes: ", "").replace("like", ""))
+      // console.log(likes)
+
+      expect(likes).toStrictEqual(["3","2","1"])
+
+    })
   })
 
 
-  describe("with 2 users and 1 note in the database (logged in as user 2)", () => {
+  describe("with 2 users and 2 notes in the database (logged in as user 2)", () => {
     beforeEach(async ({ page, request }) => {
-      await page.goto('http://localhost:5173')
 
       // delete everything in database
       await request.post("http://localhost:5173/api/reset")
+      // go to page
+      await page.goto('http://localhost:5173')
       // add admin user in database
       await request.post("http://localhost:5173/api/users", {
         data: {
@@ -128,11 +182,18 @@ describe('Blog app', () => {
       await page.getByTestId("url").fill("http://random")
       await page.getByTestId("create").click() 
 
+      await page.waitForTimeout(50)
+
       // log in as user 2
       await page.getByRole("button", {name: "logout"}).click()
       await page.getByTestId("username").fill("Admin2")
       await page.getByTestId("password").fill("123")
       await page.getByTestId("submit").click()
+
+      await page.getByRole("button", {name: "create blog"}).click()
+      await page.getByTestId("title").fill("Note2")
+      await page.getByTestId("url").fill("http://random2")
+      await page.getByTestId("create").click() 
     })
 
 
@@ -142,5 +203,40 @@ describe('Blog app', () => {
       await page.getByRole("button", {name: "view"}).click()
       await expect(page.getByRole("button", {name: "delete"})).not.toBeVisible()
     })
+
+    // test.only("blogs are sorted by likes in descending order", async ({ page }) => {
+    //   // create a third blog for good measure
+    //   await page.getByTestId("title").fill("Note3")
+    //   await page.getByTestId("url").fill("http://random3")
+    //   await page.getByTestId("create").click() 
+
+    //   await page.waitForTimeout(50)
+
+    //   const blogs = await page.getByTestId("blog").all()
+
+    //   // like the blogs
+    //   const cur_like = 1
+    //   for (let blogElem of blogs) {
+    //     await blogElem.getByRole("button", {name: "view"}).click()
+    //     for (let i = 0; i <= cur_like; i++) {
+    //       await page.waitForTimeout(50)
+    //       await blogElem.getByRole("button", {name: "like"}).click()
+    //     }
+    //     cur_like++
+    //   }
+    //   await page.pause()
+
+    //   // get the likes
+    //   const likeText = []
+    //   for (let blogElem of blogs) {
+    //     likeText.push(await blogElem.getByText("likes: ", {exact: false}).textContent())
+    //   }
+    //   console.log(likeText)
+    //   const likes = likeText.map(liketext => liketext.replace("likes: ", "").replace("like", ""))
+    //   console.log(likes)
+
+
+    // })
+
   })
 })

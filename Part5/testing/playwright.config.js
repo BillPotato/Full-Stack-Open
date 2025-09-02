@@ -80,6 +80,6 @@ export default defineConfig({
   timeout: 6000,
   fullyParallel: false,
   workers: 1,
-  PW_TEST_HTML_REPORT_OPEN: 'never',
+  reporter: process.env.CI ? 'html' : 'line',
 });
 
