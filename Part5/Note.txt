@@ -1,0 +1,2 @@
+Testing: Vitest (testing), react-testing-library (rendering), jest-dom (extend power)
+Simulate: jsdom (DOM), user-event (user input)
