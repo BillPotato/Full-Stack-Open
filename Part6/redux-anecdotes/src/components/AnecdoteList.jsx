@@ -17,8 +17,12 @@ const Anecdote = ({ anecdote, onVote }) => {
 
 const AnecdoteList = () => {
 	// Note: sorting is done in useSelector
-	const anecdotes = useSelector(state => [...state].sort((anecA, anecB) => anecB.votes - anecA.votes))	
+	const anecdotes = useSelector(state => state.anecdotes)	
+	const filter = useSelector(state => state.filter)
 	const dispatch = useDispatch()
+
+	const visibleAnecdotes = [...anecdotes].filter(anecdote => anecdote.content.includes(filter))
+	const sortedAnecdotes = [...visibleAnecdotes].sort((anecA, anecB) => anecB.votes - anecA.votes)
 
 	const onVote = (id) => {
 		console.log("vote ", id)
@@ -29,7 +33,7 @@ const AnecdoteList = () => {
 		<div>
 			<h2>Anecdotes</h2>
 			<div>
-			{anecdotes.map(anecdote =>
+			{sortedAnecdotes.map(anecdote =>
 				<Anecdote
 					key={anecdote.id}
 					anecdote={anecdote}
