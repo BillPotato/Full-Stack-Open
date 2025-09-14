@@ -8,8 +8,7 @@ const AnecdoteForm = () => {
 	const onCreateAnecdote = async (event) => {
 		event.preventDefault()
 		console.log("create note")
-		anecdoteServices.createNew(event.target.anecdote.value)
-			.then(newAnecdote => dispatch(createAnecdote(newAnecdote)))
+		dispatch(createAnecdote(event.target.anecdote.value))
 		event.target.anecdote.value = ""	
 	} 
 
