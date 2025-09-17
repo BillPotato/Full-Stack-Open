@@ -20,20 +20,20 @@ const App = () => {
   //   },
   // ]
 
-  console.log(getAnecdotes())
-
-  const anecdotes = useQuery({
+  const result = useQuery({
     queryKey: ["anecdotes"],
     queryFn: getAnecdotes,
     retry: 3,
   })
 
-  if ( anecdotes.isLoading ) {
+  if ( result.isLoading ) {
     return <div>Loading...</div>
   }
-  else if ( anecdotes.isError ) {
+  if ( result.isError ) {
     return <div>EOROROROROROROROOR YOUR CODE SUCKS</div>
   }
+
+  const anecdotes = result.data
 
   return (
     <div>
