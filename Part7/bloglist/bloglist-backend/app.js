@@ -1,0 +1,20 @@
+const config = require("./utils/config.js")
+const express = require("express")
+const mongoose = require("mongoose")
+const middleware = require("./utils/middleware.js")
+const blogRouter = require("./controllers/blog.js")
+const userRouter = require("./controllers/user.js")
+const loginRouter = require("./controllers/login.js")
+
+const app = express()
+
+const mongoUrl = config.MONGODB_URI
+mongoose.connect(mongoUrl)
+
+app.use(express.json())
+
+app.use("/api/blogs", middleware.tokenExtractor, blogRouter)
+app.use("/api/users", userRouter)
+app.use("/api/login", loginRouter)
+
+module.exports = app
