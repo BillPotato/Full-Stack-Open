@@ -1,3 +1,22 @@
+interface Input {
+  height: number,
+  weight: number
+}
+
+const parseArguments = (argv: string[]): Input => {
+  if (argv.length != 4) throw new Error("Provide height and weight as arguments");
+
+  const height: number = Number(argv[2]);
+  const weight: number = Number(argv[3]);
+
+  if (isNaN(height) || isNaN(weight)) throw new Error("Invalid height/weight");
+
+  return {
+    height,
+    weight
+  }
+}
+
 const calculateBmi = (height: number, weight: number): string => {
     const bmi = weight / (height/100)**2;
     switch (true) {
@@ -10,6 +29,8 @@ const calculateBmi = (height: number, weight: number): string => {
         default:
             return "Obese";
     }
-}
+};
 
-console.log(calculateBmi(180, 74))
+const { height, weight } = parseArguments(process.argv);
+
+console.log(calculateBmi(height, weight));
