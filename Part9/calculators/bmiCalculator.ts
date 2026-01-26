@@ -1,9 +1,9 @@
-interface Input {
+interface BmiInput {
   height: number,
   weight: number
 }
 
-const parseArguments = (argv: string[]): Input => {
+const parseBmiArguments = (argv: string[]): BmiInput => {
   if (argv.length != 4) throw new Error("Provide height and weight as arguments");
 
   const height: number = Number(argv[2]);
@@ -31,6 +31,6 @@ const calculateBmi = (height: number, weight: number): string => {
     }
 };
 
-const { height, weight } = parseArguments(process.argv);
+const { height, weight } = parseBmiArguments(process.argv);
 
 console.log(calculateBmi(height, weight));
