@@ -31,6 +31,10 @@ const calculateBmi = (height: number, weight: number): string => {
     }
 };
 
-const { height, weight } = parseBmiArguments(process.argv);
+if (require.main === module) {
+    const { height, weight } = parseBmiArguments(process.argv);
 
-console.log(calculateBmi(height, weight));
+    console.log(calculateBmi(height, weight));
+}
+
+export default calculateBmi;
