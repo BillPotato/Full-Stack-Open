@@ -56,6 +56,10 @@ const calculateExercises = (record: number[], target: number): Result => {
     return res;
 }
 
-const {record, target} = parseExerciseArguments(process.argv);
+if (require.main === module) {
+    const {record, target} = parseExerciseArguments(process.argv);
 
-console.log(calculateExercises(record, target));
+    console.log(calculateExercises(record, target));
+}
+
+export default calculateExercises;
