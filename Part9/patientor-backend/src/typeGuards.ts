@@ -1,3 +1,9 @@
+import { Gender } from "./types";
+
+export const isString = (param: unknown): param is string => {
+    return typeof param === "string";
+}
+
 export const isName = (name: unknown): name is string => {
     return typeof name === "string";
 }
@@ -6,8 +12,8 @@ export const isDateOfBirth = (dateOfBirth: unknown): dateOfBirth is string => {
     return typeof dateOfBirth === "string";
 }
 
-export const isGender = (gender: unknown): gender is string => {
-    return typeof gender === "string";
+export const isGender = (gender: string): gender is Gender => {
+    return Object.values(Gender).map(v => v.toString()).includes(gender);
 }
 
 export const isOccupation = (occupation: unknown): occupation is string => {

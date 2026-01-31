@@ -1,6 +1,6 @@
 import data from "../data/patients";
 import { NewPatient, Patient, PatientWithoutSsn } from "../types";
-// import { v1 as uuid } from 'uuid';
+import crypto from "crypto";
 
 const patientData = data;
 
@@ -20,8 +20,7 @@ export const getPatientsWithoutSsn = (): PatientWithoutSsn[] => {
 
 export const addPatient = ( patient: NewPatient ) => {
     const newPatient = {
-        // id: uuid(),
-        id: "1",
+        id: crypto.randomUUID(),
         ...patient
     }
 

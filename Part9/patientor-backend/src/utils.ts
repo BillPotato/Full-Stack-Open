@@ -1,4 +1,4 @@
-import { isDateOfBirth, isGender, isName, isOccupation, isSsn } from "./typeGuards";
+import { isDateOfBirth, isGender, isName, isOccupation, isSsn, isString } from "./typeGuards";
 import { NewPatient } from "./types";
 
 export const parseName = ( name: unknown ) => {
@@ -18,7 +18,7 @@ export const parseDateOfBirth = ( dateOfBirth: unknown ) => {
 }
 
 export const parseGender = ( gender: unknown ) => {
-    if ( !gender || !isGender(gender) ) {
+    if ( !gender || !isString(gender) || !isGender(gender) ) {
         throw Error("Incorrect/missing gender");
     }
 
